@@ -24,6 +24,7 @@ SOFTWARE.
 from timeit import default_timer
 from sys import stdout, version_info
 from multiprocessing import Pool
+from collections import defaultdict
 
 from pyvisgraph.graph import Graph, Edge
 from pyvisgraph.shortest_path import shortest_path
@@ -134,6 +135,64 @@ class VisGraph(object):
         """
 
         return closest_point(point, self.graph, polygon_id, length)
+
+    def _effective_area(self, p1, p2, p3):
+        """Calculate the area formed by three given points"""
+        x1, y1 = p1.x, p1.y
+        x2, y2 = p2.x, p2.y
+        x3, y3 = p3.x, p3.y
+        return abs(x1*y2 + x2*y3 + x3*y1 - (x1*y3 + x3*y2 + x2*y1))/2.0
+
+    def simplify_polygon(self, polygons, target_resolution):
+        """Simplify a list of polygons via Visvalingam's algorithm"""
+        new_polygons = []
+        for poly in polygons:
+            poly_builder = {}
+
+            orig_area = 0.0
+            for i, point in enumerate(poly):
+                prev_point = poly[(i - 1) % len(poly)]
+                next_point = poly[(i + 1) % len(poly)]
+                area = self._effective_area(point, prev_point, next_point)
+
+                orig_area += area
+                poly_builder[point] = (area, prev_point, next_point)
+
+            current_area = orig_area
+            current_res = 1.0
+            while (current_res > target_resolution) and len(poly_builder) > 3:
+                least_area_point = min(poly_builder,
+                                       key=lambda p: poly_builder[p][0])
+
+                a, prev_point, next_point = poly_builder[least_area_point]
+
+                a1, prev_1, prev_2 = (i if i is not least_area_point
+                                      else next_point
+                                      for i in poly_builder[prev_point])
+                a2, next_1, next_2 = (i if i is not least_area_point
+                                      else prev_point
+                                      for i in poly_builder[next_point])
+
+                del poly_builder[least_area_point]
+                current_area -= a
+
+                a1 = self._effective_area(prev_point, prev_1, prev_2)
+                poly_builder[prev_point] = (a1, prev_1, prev_2)
+
+                a2 = self._effective_area(next_point, next_1, next_2)
+                poly_builder[next_point] = (a2, next_1, next_2)
+                current_res = current_area/orig_area
+
+            p, val = poly_builder.popitem()
+            a, prev_p, next_p = val
+
+            final_poly = [p]
+            while (next_p is not final_poly[0]):
+                final_poly.append(next_p)
+                next_p = poly_builder[next_p][2]
+
+            new_polygons.append(final_poly)
+        return new_polygons
 
 
 def _vis_graph_wrapper(args):
