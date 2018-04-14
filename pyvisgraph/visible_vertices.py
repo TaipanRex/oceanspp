@@ -130,6 +130,7 @@ def polygon_crossing(p1, poly_edges):
         co1 = (ccw(p1, edge.p2, p2) == 0) and (edge.p2.x > p1.x)
         if co0 and co1: continue
         co_point = edge.p1 if co0 else edge.p2
+        if co0 and co1: continue
         if co0 or co1:
             if edge.get_adjacent(co_point).y > p1.y:
                 co_dir += 1
@@ -288,7 +289,8 @@ def angle2(point_a, point_b, point_c):
     a = (point_c.x - point_b.x)**2 + (point_c.y - point_b.y)**2
     b = (point_c.x - point_a.x)**2 + (point_c.y - point_a.y)**2
     c = (point_b.x - point_a.x)**2 + (point_b.y - point_a.y)**2
-    return acos((a + c - b) / (2 * sqrt(a) * sqrt(c)))
+    cos_value = (a + c - b) / (2 * sqrt(a) * sqrt(c))
+    return acos( max(-1, min(1, cos_value)) )
 
 
 def ccw(A, B, C):
