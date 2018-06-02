@@ -56,7 +56,7 @@ class VisGraph(object):
         with open(filename, 'wb') as output:
             pickle.dump((self.graph, self.visgraph), output, -1)
 
-    def build(self, input, workers=1, **kwargs): 
+    def build(self, input, workers=1, status=True): 
         """Build visibility graph based on a list of polygons.
 
         The input must be a list of polygons, where each polygon is a list of
@@ -66,23 +66,31 @@ class VisGraph(object):
         Take advantage of processors with multiple cores by setting workers to
         the number of subprocesses you want. Defaults to 1, i.e. no subprocess
         will be started.
+        Set status=False to turn off the statusbar when building.
         """
-        if 'status' in kwargs:
-            warn("build() 'status' parameter is deprecated since 0.1.8", DeprecationWarning)
 
         self.graph = Graph(input)
         self.visgraph = Graph([])
 
-        pool = Pool(workers)
         points = self.graph.get_points()
-        batch_size = 10 # int(len(points) / workers) # Smaller batches are easier to track
-        batches = [(self.graph, points[i:i + batch_size], i/batch_size)
-                   for i in xrange(0, len(points), batch_size)]
+        batch_size = 10 
 
-        results = list(tqdm(pool.imap(_vis_graph_wrapper, batches), total=len(batches)))
-        for result in results:
-            for edge in result:
-                self.visgraph.add_edge(edge)
+        if workers == 1:
+            for batch in tqdm([points[i:i + batch_size]
+                               for i in xrange(0, len(points), batch_size)],
+                            disable=not status):
+                for edge in _vis_graph(self.graph, batch):
+                    self.visgraph.add_edge(edge)
+        else:
+            pool = Pool(workers)
+            batches = [(self.graph, points[i:i + batch_size])
+                       for i in xrange(0, len(points), batch_size)]
+
+            results = list(tqdm(pool.imap(_vis_graph_wrapper, batches), total=len(batches),
+                disable=not status))
+            for result in results:
+                for edge in result:
+                    self.visgraph.add_edge(edge)
 
     def update(self, points, origin=None, destination=None):
         """Update visgraph by checking visibility of Points in list points."""
@@ -137,7 +145,7 @@ def _vis_graph_wrapper(args):
     except KeyboardInterrupt:
         pass
 
-def _vis_graph(graph, points, worker):
+def _vis_graph(graph, points):
     visible_edges = []
     for p1 in points:
         for p2 in visible_vertices(p1, graph, scan='half'):
