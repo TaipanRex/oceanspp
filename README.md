@@ -13,6 +13,9 @@ a list of simple obstacle polygons. The visibility graph algorithm (D.T. Lee)
 runs in O(n^2 log n) time. The shortest path is found using Djikstra's
 algorithm.
 
+To see how visibility graphs work interactively, take a look at the
+[Visibility Graph Simulator](https://github.com/TaipanRex/visgraph_simulator)
+built with Pyvisgraph.
 
 ## Installing Pyvisgraph
 ```
