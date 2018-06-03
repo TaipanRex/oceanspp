@@ -92,6 +92,11 @@ class VisGraph(object):
                 for edge in result:
                     self.visgraph.add_edge(edge)
 
+    def find_visible(self, point):
+        """Find vertices visible from point."""
+
+        return visible_vertices(point, self.graph)
+
     def update(self, points, origin=None, destination=None):
         """Update visgraph by checking visibility of Points in list points."""
 
