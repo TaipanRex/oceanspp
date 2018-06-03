@@ -1,0 +1,7 @@
+include MANIFEST.in
+include requirements.txt
+include LICENSE.txt
+include CONTRIBUTING.md
+include setup.py
+include setup.cfg
+include README.md
