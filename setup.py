@@ -1,4 +1,8 @@
-from distutils.core import setup
+from setuptools import setup
+
+with open('requirements', 'r') as fr:
+  required = fr.read().splitlines()
+
 setup(
   name = 'pyvisgraph',
   packages = ['pyvisgraph'],
@@ -7,6 +11,7 @@ setup(
   author = 'Christian Reksten-Monsen',
   author_email = 'christian@reksten-monsen.com',
   url = 'https://github.com/TaipanRex/pyvisgraph',
+  install_requires = required,
   download_url = 'https://github.com/TaipanRex/pyvisgraph/tarball/0.2.1',
   keywords = ['visibility', 'graph', 'shortest'],
   classifiers = [],
