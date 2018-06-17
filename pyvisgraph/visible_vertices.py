@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 from __future__ import division
-from math import pi, sqrt, atan, acos
+from math import pi, sqrt, atan, acos, fabs
 from pyvisgraph.graph import Point
 
 INF = 10000
@@ -280,7 +280,24 @@ def angle2(point_a, point_b, point_c):
     b = (point_c.x - point_a.x)**2 + (point_c.y - point_a.y)**2
     c = (point_b.x - point_a.x)**2 + (point_b.y - point_a.y)**2
     cos_value = (a + c - b) / (2 * sqrt(a) * sqrt(c))
-    return acos(int(cos_value*T)/T2)
+    interior  = int(cos_value*T)/T2
+
+    # In some cases interior was above 1 due to floating point
+    # problems.
+    try:
+        return acos(interior)
+    except:
+        if isclose(interior, 1):
+            return 0
+        elif isclose(isclose, -1):
+            return pi
+        else:
+            raise
+
+
+def isclose(a, b, rtol=1e-05, atol=1e-08):
+    '''Implemented numpy.isclose to avoid the numpy dependency'''
+    return fabs(a-b) <= (atol + rtol * fabs(b))
 
 
 def ccw(A, B, C):
