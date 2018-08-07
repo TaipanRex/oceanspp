@@ -22,6 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 from collections import defaultdict
+EPSILON = 1e-6
+
+
+def set_epsilon(value):
+    """
+    set EPSILON value
+    """
+
+    EPSILON = float(value)
+    return EPSILON
 
 
 class Point(object):
@@ -33,7 +43,7 @@ class Point(object):
         self.polygon_id = polygon_id
 
     def __eq__(self, point):
-        return point and self.x == point.x and self.y == point.y
+        return point and abs(self.x - point.x) + abs(self.y - point.y) < EPSILON
 
     def __ne__(self, point):
         return not self.__eq__(point)
