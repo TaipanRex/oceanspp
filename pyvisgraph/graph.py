@@ -25,6 +25,13 @@ from collections import defaultdict
 EPSILON = 1e-6
 
 
+def epsilon():
+    """
+    get epsilon
+    """
+    return EPSILON
+
+
 def set_epsilon(value):
     """
     set EPSILON value
