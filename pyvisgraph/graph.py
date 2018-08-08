@@ -29,7 +29,7 @@ def set_epsilon(value):
     """
     set EPSILON value
     """
-
+    global EPSILON
     EPSILON = float(value)
     return EPSILON
 
