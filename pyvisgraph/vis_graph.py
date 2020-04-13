@@ -105,7 +105,7 @@ class VisGraph(object):
                                       destination=destination):
                 self.visgraph.add_edge(Edge(p, v))
 
-    def shortest_path(self, origin, destination):
+    def shortest_path(self, origin, destination, solver = "dijkstra"):
         """Find and return shortest path between origin and destination.
 
         Will return in-order list of Points of the shortest path found. If
@@ -117,7 +117,7 @@ class VisGraph(object):
         origin_exists = origin in self.visgraph
         dest_exists = destination in self.visgraph
         if origin_exists and dest_exists:
-            return shortest_path(self.visgraph, origin, destination)
+            return shortest_path(self.visgraph, origin, destination, solver)
         orgn = None if origin_exists else origin
         dest = None if dest_exists else destination
         add_to_visg = Graph([])
@@ -127,7 +127,7 @@ class VisGraph(object):
         if not dest_exists:
             for v in visible_vertices(destination, self.graph, origin=orgn):
                 add_to_visg.add_edge(Edge(destination, v))
-        return shortest_path(self.visgraph, origin, destination, add_to_visg)
+        return shortest_path(self.visgraph, origin, destination, add_to_visg, solver)
 
     def point_in_polygon(self, point):
         """Return polygon_id if point in a polygon, -1 otherwise."""

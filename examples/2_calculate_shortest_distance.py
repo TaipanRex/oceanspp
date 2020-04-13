@@ -23,6 +23,7 @@ SOFTWARE.
 """
 import pyvisgraph as vg
 from haversine import haversine
+import time
 
 # In this example we will find the shortest path between two points on a
 # sphere, i.e. on earth. To calculate the total distance of that path, we
@@ -37,8 +38,16 @@ end_point = vg.Point(103.851959, 1.290270) # Singapore
 graph = vg.VisGraph()
 graph.load('GSHHS_c_L1.graph')
 
-# Get the shortest path
+# Get the shortest path with dijkstra's
+startTime = time.time()
 shortest_path = graph.shortest_path(start_point, end_point)
+print("Solved with Dijkstra's algorithm in {} seconds.".format(time.time() - startTime))
+
+# Get the shortest path with A*
+startTime = time.time()
+shortest_path = graph.shortest_path(start_point, end_point, solver = "astar")
+print("Solved with A* algorithm in {} seconds.".format(time.time() - startTime))
+
 
 # Calculate the total distance of the shortest path in km
 path_distance = 0
