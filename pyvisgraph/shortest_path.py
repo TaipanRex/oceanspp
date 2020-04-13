@@ -60,9 +60,45 @@ def dijkstra(graph, origin, destination, add_to_visgraph):
                 P[w] = v
     return (D, P)
 
+def astar(graph, origin, destination, add_to_visgraph):
+    """
+    A* search algorithm, using Euclidean distance heuristic
+    Note that this is a modified version of an
+    A* implementation by Amit Patel.
+    https://www.redblobgames.com/pathfinding/a-star/implementation.html
+    """
+    frontier = priority_dict()
+    frontier[origin] = 0
+    cameFrom = {}
+    costSoFar = {}
+    cameFrom[origin] = None
+    costSoFar[origin] = 0
 
-def shortest_path(graph, origin, destination, add_to_visgraph=None):
-    D, P = dijkstra(graph, origin, destination, add_to_visgraph)
+    while len(frontier) > 0:
+        current = frontier.pop_smallest()
+        if current == destination:
+            break
+
+        edges = graph[current]
+        if add_to_visgraph != None and len(add_to_visgraph[current]) > 0:
+            edges = add_to_visgraph[current] | graph[current]
+        for e in edges:
+            w = e.get_adjacent(current)
+            new_cost = costSoFar[current] + edge_distance(current, w)
+            if w not in costSoFar or new_cost < costSoFar[w]:
+                costSoFar[w] = new_cost
+                priority = new_cost + edge_distance(w, destination)
+                frontier[w] = priority
+                cameFrom[w] = current
+
+    return (frontier, cameFrom)
+    
+
+def shortest_path(graph, origin, destination, add_to_visgraph=None, solver="dijkstra"):
+    if solver == "astar":
+        D, P = astar(graph, origin, destination, add_to_visgraph)
+    else: # Default to dijkstra
+        D, P = dijkstra(graph, origin, destination, add_to_visgraph)
     path = []
     while 1:
         path.append(destination)
