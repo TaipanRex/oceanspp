@@ -1,2 +1,0 @@
-- name: Python wheels manylinux build
-  uses: RalfG/python-wheels-manylinux-build@v0.3.3
